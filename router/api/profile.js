@@ -6,13 +6,16 @@ const { check, validationResult } = require("express-validator");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 
-//@route    GET profile/me
+//@route    GET api/profile/me
 //@desc     Get current user profile
 //@access   private
 router.get("/me", auth, async (req, res) => {
   try {
     //console.log(req.user);
-    const profile = await Profile.findOne({ user: req.user.id }).populate();
+    const profile = await Profile.findOne({ user: req.user.id }).populate(
+      "user",
+      ["name", "avatar"]
+    );
 
     if (!profile) {
       return res.status(404).send({ msg: "No profile for this user" });
@@ -24,7 +27,7 @@ router.get("/me", auth, async (req, res) => {
   }
 });
 
-//@route    POST /
+//@route    POST api/profile
 //@desc     Create or Update user profile
 //@access   private
 router.post(
@@ -107,26 +110,26 @@ router.post(
   }
 );
 
-//@route    GET /
+//@route    GET /api/profile
 //@desc     retrieve all profiles
 //@access   private
 router.get("/", async (req, res) => {
   try {
-    const profiles = await Profile.find().populate("User", ["name", "avatar"]);
+    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
     if (profiles) res.send(profiles);
   } catch (err) {
     res.status(500).send("Server Error");
   }
 });
 
-//@route    GET /user/:user_id
+//@route    GET api/profile/user/:user_id
 //@desc     retrieve profile via user ID
 //@access   private
 router.get("/user/:user_id", async (req, res) => {
   try {
     const profile = await Profile.findOne({
       user: req.params.user_id,
-    }).populate("User", ["name", "avatar"]);
+    }).populate("user", ["name", "avatar"]);
     if (!profile)
       return res.status(404).send({ msg: "No profile found for this user" });
 

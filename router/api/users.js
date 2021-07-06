@@ -3,78 +3,91 @@ const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { check, validationResult } = require("express-validator");
 
 const User = require("../../models/User");
 const key = require("../../config/keys");
 const auth = require("../../middleware/auth");
 
-//load input validation
-const validateRegisterInput = require("../../validation/register");
-const validateLoginInput = require("../../validation/login");
-
-//@route     POST /register
+//@route     POST api/users/register
 //@desc      Register User
 //@access    Public
-router.post("/register", async (req, res) => {
-  try {
-    const { errors, isValid } = validateRegisterInput(req.body);
-    //check validation
-    if (!isValid) {
-      return res.status(400).send(errors);
-    }
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      errors.email = "Email already exists";
-      res.status(400).send({ errors });
-    }
-    const avatar = gravatar.url(req.body.email, {
-      s: "200", //size
-      r: "pg", //rating
-      d: "mm", //default icon
-    });
-    const newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
-      avatar,
-      password: req.body.password,
-    });
-    const token = await newUser.generateAuthToken();
+router.post(
+  "/register",
+  [
+    check("name", "Name is required").not().isEmpty(),
+    check("email", "Please include a valid email").isEmail(),
+    check(
+      "password",
+      "Please enter password with 6 or more characters"
+    ).isLength({ min: 6 }),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+      }
 
-    await newUser.save();
-    res.status(200).send({ newUser, token, msg: "Registration Successful!" });
-  } catch (error) {
-    res.status(401);
+      const { name, email, password } = req.body;
+      let user = await User.findOne({ email });
+      if (user) {
+        res.status(400).send({ errors: [{ msg: "User already exists" }] });
+      }
+      const avatar = gravatar.url(req.body.email, {
+        s: "200", //size
+        r: "pg", //rating
+        d: "mm", //default icon
+      });
+      const newUser = new User({
+        name: req.body.name,
+        email: req.body.email,
+        avatar,
+        password: req.body.password,
+      });
+      const token = await newUser.generateAuthToken();
+
+      await newUser.save();
+      res.status(200).send({ newUser, token, msg: "Registration Successful!" });
+    } catch (error) {
+      res.status(401);
+    }
   }
-});
+);
 
-//@route     POST /login
+//@route     POST api/users/login
 //@desc      Login User / Return JWT token
 //@access    Public
-router.post("/login", async (req, res) => {
-  try {
-    const { errors, isValid } = validateLoginInput(req.body);
-    //check validation
-    if (!isValid) {
-      return res.status(400).send(errors);
+router.post(
+  "/login",
+  [
+    check("email", "Please include a valid email").isEmail(),
+    check("password", "Password is required").not().isEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+      }
+
+      const user = await User.findByCredentials(
+        req.body.email,
+        req.body.password
+      );
+
+      const token = await user.generateAuthToken();
+
+      if (!user) {
+        res.status(404).send({ errors: [{ msg: "Unable to login!" }] });
+      }
+
+      res.send({ user, token });
+    } catch (errors) {
+      res.status(500).send({ errors: "Server Error" });
     }
-
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    );
-
-    const token = await user.generateAuthToken();
-
-    if (!user) {
-      errors.email = "User not found";
-      res.status(404).send({ errors });
-    }
-
-    res.send({ user, token });
-  } catch (errors) {
-    res.status(400).send({ errors: "Unable to login" });
   }
-});
+);
 
 // router.get("/me", auth, async (req, res) => {
 //   res.send(req.user);

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 
 const userRouter = require("./router/api/users");
 const profileRouter = require("./router/api/profile");
@@ -9,8 +9,8 @@ const postRouter = require("./router/api/posts");
 const app = express();
 
 //bodyParser middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json({ extended: false }));
+//app.use(express.urlencoded());
+app.use(express.json());
 
 //DB Config
 const db = require("./config/keys").mongodbURI;
@@ -29,9 +29,9 @@ mongoose
   .catch((err) => console.log(err));
 
 //use Routes
-app.use(userRouter);
-app.use(profileRouter);
-app.use(postRouter);
+app.use("/api/users", userRouter);
+app.use("/api/profile", profileRouter);
+app.use("/api/posts", postRouter);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
