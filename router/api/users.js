@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const gravatar = require("gravatar");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { check, validationResult } = require("express-validator");
 
 const User = require("../../models/User");
@@ -48,7 +46,7 @@ router.post(
       const token = await newUser.generateAuthToken();
 
       await newUser.save();
-      res.status(200).send({ newUser, token, msg: "Registration Successful!" });
+      res.status(200).send({ token });
     } catch (error) {
       res.status(401);
     }
@@ -82,7 +80,7 @@ router.post(
         res.status(404).send({ errors: [{ msg: "Unable to login!" }] });
       }
 
-      res.send({ user, token });
+      res.send({ token });
     } catch (errors) {
       res.status(500).send({ errors: "Server Error" });
     }
