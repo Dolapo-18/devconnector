@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const userRouter = require("./router/api/users");
 const profileRouter = require("./router/api/profile");
 const postRouter = require("./router/api/posts");
+const authRouter = require("./router/api/auth");
 
 const app = express();
 
@@ -32,6 +33,7 @@ mongoose
 app.use("/api/users", userRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/auth", authRouter);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
