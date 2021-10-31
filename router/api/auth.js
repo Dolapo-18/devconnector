@@ -15,9 +15,46 @@ router.get("/", auth, async (req, res) => {
     const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (err) {
-    console.error(err.message);
+    //console.error(err.message);
     res.status(500).send("Server Error");
   }
 });
+
+//@route POST <api />
+//@desc Authenticate user and get token
+//@access Public
+router.post(
+  "/",
+
+  [
+    check("email", "Please include a valid email").isEmail(),
+    check("password", "Password is required").not().isEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+      }
+
+      const user = await User.findByCredentials(
+        req.body.email,
+        req.body.password
+      );
+
+      if (!user) {
+        return res
+          .status(400)
+          .send({ errors: [{ msg: "Invalid Credentials" }] });
+      }
+
+      const token = await user.generateAuthToken();
+
+      res.send({ token });
+    } catch (errors) {
+      res.status(500).send({ errors: "Server Errors" });
+    }
+  }
+);
 
 module.exports = router;

@@ -1,12 +1,11 @@
 import React, { Fragment, useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { setAlert } from "../../actions/alert";
 import { login } from "../../actions/auth";
 import PropTypes from "prop-types";
 
-const Login = ({ setAlert, login }) => {
+const Login = ({ login, isAuthenticated }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,6 +23,10 @@ const Login = ({ setAlert, login }) => {
     login(email, password);
   };
 
+  //redirect if logged in
+  if (isAuthenticated) {
+    return <Redirect to="/dashboard" />;
+  }
   return (
     <Fragment>
       <h1 className="large text-primary">Sign In</h1>
@@ -61,8 +64,12 @@ const Login = ({ setAlert, login }) => {
 };
 
 Login.propTypes = {
-  setAlert: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
   login: PropTypes.func.isRequired,
 };
 
-export default connect(null, { setAlert, login })(Login);
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { login })(Login);
