@@ -76,8 +76,8 @@ userSchema.methods.generateAuthToken = async function () {
 };
 
 //the "statics" keyword allows this method be applicable to models
-userSchema.statics.findByCredentials = async (email, password) => {
-  const user = await User.findOne({ email });
+//userSchema.statics.findByCredentials = async (email, password) => {
+ // const user = await User.findOne({ email });
 
   // if (!user) {
   //   //throw new Error("User not found");
@@ -85,15 +85,15 @@ userSchema.statics.findByCredentials = async (email, password) => {
   //     errors: "User not found",
   //   };
   // }
-  const isMatch = await bcrypt.compare(password, user.password);
+  //const isMatch = await bcrypt.compare(password, user.password);
 
   // if (!isMatch) {
   //   throw new Error("Unable to login");
   // }
-  if (user && isMatch) {
-    return user;
-  }
-};
+  //if (user && isMatch) {
+   // return user;
+  ////}
+//};
 //hash plain password before saving user to DB
 userSchema.pre("save", async function (next) {
   const user = this;
