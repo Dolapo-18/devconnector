@@ -34,7 +34,7 @@ const AddExperience = ({ addExperience, history }) => {
   return (
     <Fragment>
       <h1 className="large text-primary">
-       Please Add An Experience
+      Add An Experience
       </h1>
       
       <p className="lead">

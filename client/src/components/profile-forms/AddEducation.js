@@ -31,7 +31,7 @@ const AddEducation = ({ addEducation, history }) => {
   return (
     <Fragment>
       <h1 className="large text-primary">
-        Please Add Your Education
+        Add Your Education
       </h1>
       <p className="lead">
         <i className="fas fa-graduation-cap"></i> Add any school, bootcamp, etc that
