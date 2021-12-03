@@ -1,10 +1,11 @@
-import React, {Fragment, useState} from 'react'
+import React, {Fragment, useState, useEffect} from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
-import {createProfile} from '../../actions/profile'
+import {createProfile, getCurrentProfile} from '../../actions/profile'
 
-const CreateProfile = ({createProfile, history}) => {
+
+const EditProfile = ({profile:{profile, loading}, getCurrentProfile, createProfile, history}) => {
 const [FormData, setFormData] = useState({
     company: '',
     website: '',
@@ -22,13 +23,37 @@ const [FormData, setFormData] = useState({
 
 const [displaySocialInputs, toggleSocialInputs] = useState(false)
 
+
+useEffect(() => {
+    getCurrentProfile()
+
+    //fill the form with current values
+    setFormData({
+        company: loading || !profile.company ? '' : profile.company,
+        website: loading || !profile.website ? '' : profile.website,
+        location: loading || !profile.location ? '' : profile.location,
+        status: loading || !profile.status ? '' : profile.status,
+        skills: loading || !profile.skills ? '' : profile.skills.join(','),
+        githubusername: loading || !profile.githubusername ? '' : profile.githubusername,
+        bio: loading || !profile.bio ? '' : profile.bio,
+        twitter: loading || !profile.social ? '' : profile.social.twitter,
+        facebook: loading || !profile.social ? '' : profile.social.facebook,
+        linkedin: loading || !profile.social ? '' : profile.social.linkedin,
+        youtube: loading || !profile.social ? '' : profile.social.youtube,
+        instagram: loading || !profile.social ? '' : profile.social.instagram,
+        
+
+    })
+},[loading])
+
 const {company, website, location, status, skills, githubusername, bio, twitter, facebook, linkedin, youtube, instagram} = FormData
 
 const onChange = e => setFormData({...FormData, [e.target.name]: e.target.value})
 
+
 const onSubmit = e => {
     e.preventDefault()
-    createProfile(FormData, history)
+    createProfile(FormData, history, true)
 }
 
     return (
@@ -133,6 +158,7 @@ const onSubmit = e => {
           <i className="fab fa-instagram fa-2x"></i>
           <input type="text" placeholder="Instagram URL" name="instagram" value={instagram} onChange={e => onChange(e)}/>
         </div>
+
             </Fragment>)}
         <input type="submit" className="btn btn-primary my-1" />
         <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>
@@ -141,8 +167,14 @@ const onSubmit = e => {
     )
 }
 
-CreateProfile.propTypes = {
+EditProfile.propTypes = {
     createProfile: PropTypes.func.isRequired,
+    getCurrentProfile: PropTypes.func.isRequired,
+    profile: PropTypes.object.isRequired,
 }
 
-export default connect(null, {createProfile})(withRouter(CreateProfile))
+const mapStateToProp = state => ({
+    profile: state.profile
+})
+
+export default connect(mapStateToProp, {getCurrentProfile,createProfile})(withRouter(EditProfile))
