@@ -1,41 +1,42 @@
-import React, {Fragment,useState} from 'react'
+import React, { Fragment, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link, withRouter } from 'react-router-dom'
 import { addExperience } from '../../actions/profile'
 import { connect } from 'react-redux'
 
-const AddExperience = ({addExperience, history}) => {
+const AddExperience = ({ addExperience, history }) => {
 
-    const [formData, setFormData] = useState({
-        title: '',
-        company: '',
-        location: '',
-        from: '',
-        current: false,
-        to: '',
-        description: ''
-    })
+  const [formData, setFormData] = useState({
+    title: '',
+    company: '',
+    location: '',
+    from: '',
+    current: false,
+    to: '',
+    description: ''
+  })
 
-    const {title, company, location, from, current, to, description} = formData
+  const { title, company, location, from, current, to, description } = formData
 
-    const onChange = e => {
-        setFormData({...formData, [e.target.name]: e.target.value })
-    }
+  const onChange = e => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
-    const [toDateDisabled, toggleDisabled] = useState(false)
+  const [toDateDisabled, toggleDisabled] = useState(false)
 
-    const onSubmit= e => {
-        e.preventDefault()
-        addExperience(formData, history)
+  const onSubmit = e => {
+    e.preventDefault()
+    addExperience(formData, history)
 
-    }
+  }
 
 
-    return (
-      <Fragment>
+  return (
+    <Fragment>
       <h1 className="large text-primary">
-       Add An Experience
+       Please Add An Experience
       </h1>
+      
       <p className="lead">
         <i className="fas fa-code-branch"></i> Add any developer/programming
         positions that you have had in the past
@@ -53,15 +54,15 @@ const AddExperience = ({addExperience, history}) => {
         </div>
         <div className="form-group">
           <h6>* From Date</h6>
-          <input type="date" name="from" value={from} onChange={e => onChange(e)}/>
+          <input type="date" name="from" value={from} onChange={e => onChange(e)} />
         </div>
-         <div className="form-group">
-          <p><input type="checkbox" name="current" checked={current}  value={current} 
-          onChange={e => {
-              setFormData({...formData, current: !current})
+        <div className="form-group">
+          <p><input type="checkbox" name="current" checked={current} value={current}
+            onChange={e => {
+              setFormData({ ...formData, current: !current })
               toggleDisabled(!toDateDisabled)
-            }} 
-           />{' '} Current Job</p>
+            }}
+          />{' '} Current Job</p>
         </div>
         <div className="form-group">
           <h6>To Date</h6>
@@ -79,13 +80,13 @@ const AddExperience = ({addExperience, history}) => {
         <input type="submit" className="btn btn-primary my-1" />
         <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>
       </form>
-      </Fragment>
-    
-    )
+    </Fragment>
+
+  )
 }
 
 AddExperience.propTypes = {
-    addExperience: PropTypes.func.isRequired,
+  addExperience: PropTypes.func.isRequired,
 }
 
-export default connect(null, {addExperience})(AddExperience)
+export default connect(null, { addExperience })(AddExperience)
