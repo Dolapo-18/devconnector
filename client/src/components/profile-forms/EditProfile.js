@@ -44,7 +44,7 @@ useEffect(() => {
         
 
     })
-},[loading])
+},[loading, getCurrentProfile])
 
 const {company, website, location, status, skills, githubusername, bio, twitter, facebook, linkedin, youtube, instagram} = FormData
 
